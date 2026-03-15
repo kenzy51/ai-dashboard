@@ -13,6 +13,8 @@ interface CallRecord {
   transcript: string;
   status: string;
   createdAt: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  recordingUrl?: any;
 }
 
 export default function ChatDetailPage() {
@@ -20,14 +22,15 @@ export default function ChatDetailPage() {
   const router = useRouter();
   const [chat, setChat] = useState<CallRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     const fetchChatDetails = async () => {
       try {
         // Fetching from your NestJS backend
-        const response = await fetch("http://127.0.0.1:3003/calls/tribeca-dental-studio");
+        const response = await fetch(
+          "http://127.0.0.1:3003/calls/tribeca-dental-studio",
+        );
         const data: CallRecord[] = await response.json();
-        
+
         // Find the specific call by the ID in the URL
         const found = data.find((c) => c._id === id);
         setChat(found || null);
@@ -41,15 +44,21 @@ export default function ChatDetailPage() {
     if (id) fetchChatDetails();
   }, [id]);
 
-  if (isLoading) return <div className="p-20 text-zinc-500 animate-pulse">Loading transcript...</div>;
-  if (!chat) return <div className="p-20 text-zinc-500">Transcript not found.</div>;
+  if (isLoading)
+    return (
+      <div className="p-20 text-zinc-500 animate-pulse">
+        Loading transcript...
+      </div>
+    );
+  if (!chat)
+    return <div className="p-20 text-zinc-500">Transcript not found.</div>;
 
   // Process the transcript string into an array of message objects
   const messages = chat.transcript.split("\n").map((line) => {
     const [role, ...textParts] = line.split(": ");
-    return { 
-      role: role?.toLowerCase().trim() || "unknown", 
-      content: textParts.join(": ") || "..." 
+    return {
+      role: role?.toLowerCase().trim() || "unknown",
+      content: textParts.join(": ") || "...",
     };
   });
 
@@ -59,7 +68,8 @@ export default function ChatDetailPage() {
         onClick={() => router.push("/chats")}
         className="flex items-center gap-2 text-zinc-500 hover:text-[#d4ff33] transition-colors group"
       >
-        <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Back to List
+        <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />{" "}
+        Back to List
       </button>
 
       <div className="flex justify-between items-end border-b border-zinc-800/50 pb-8">
@@ -117,16 +127,27 @@ export default function ChatDetailPage() {
             </div>
 
             <div className="space-y-4">
-               <div className="flex items-center justify-between text-xs border-b border-zinc-800/50 pb-4">
-                 <span className="text-zinc-500">Procedure</span>
-                 <span className="text-zinc-200 font-mono">{chat.procedure}</span>
-               </div>
-               <div className="flex items-center justify-between text-xs">
-                 <span className="text-zinc-500">Call Date</span>
-                 <span className="text-zinc-200 font-mono">
-                   {new Date(chat.createdAt).toLocaleDateString()}
-                 </span>
-               </div>
+              <div className="flex items-center justify-between text-xs border-b border-zinc-800/50 pb-4">
+                <span className="text-zinc-500">Procedure</span>
+                <span className="text-zinc-200 font-mono">
+                  {chat.procedure}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-zinc-500">Call Date</span>
+                <span className="text-zinc-200 font-mono">
+                  {new Date(chat.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+            <div className="mt-4">
+              <h3 className="text-zinc-100 font-bold text-xs uppercase mb-2">
+                Call Recording
+              </h3>
+              <audio
+                controls
+                src={`http://127.0.0.1:3003/calls/stream-recording?url=${encodeURIComponent(chat.recordingUrl)}`}
+              />
             </div>
 
             <button className="w-full bg-zinc-100 hover:bg-[#d4ff33] text-black font-bold py-4 rounded-2xl transition-all active:scale-95 shadow-xl">
