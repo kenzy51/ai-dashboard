@@ -28,7 +28,7 @@ export default function ChatsListPage() {
   useEffect(() => {
     const fetchCalls = async () => {
       try {
-        const response = await fetch("http://localhost:3003/calls/tribeca-dental-studio");
+        const response = await fetch("https://fusion-ai-bot.onrender.com/calls/tribeca-dental-studio");
         const data = await response.json();
         setCalls(data);
       } catch (error) {
