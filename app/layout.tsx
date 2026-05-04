@@ -23,9 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark"> {/* Add dark class for that gopis look */}
+    <html lang="en" className="dark"> 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* Main Wrapper to hold Sidebar and Content side-by-side */}
         <div className="flex min-h-screen "> 
           <Sidebar />
           

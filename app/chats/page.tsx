@@ -20,7 +20,7 @@ interface CallRecord {
   status: string;
   createdAt: string;
 }
-
+const localUrl = "http://localhost:3003/calls/tribeca-dental-studio";
 export default function ChatsListPage() {
   const [calls, setCalls] = useState<CallRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,9 +28,10 @@ export default function ChatsListPage() {
   useEffect(() => {
     const fetchCalls = async () => {
       try {
-        const response = await fetch("https://fusion-ai-bot.onrender.com/calls/tribeca-dental-studio");
+        const response = await fetch(localUrl);
         const data = await response.json();
         setCalls(data);
+        console.log(calls)
       } catch (error) {
         console.error("Failed to fetch calls:", error);
       } finally {
@@ -73,18 +74,24 @@ export default function ChatsListPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-20 text-zinc-500">
+                <TableCell
+                  colSpan={4}
+                  className="text-center py-20 text-zinc-500"
+                >
                   Loading conversations...
                 </TableCell>
               </TableRow>
             ) : calls.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-20 text-zinc-500">
+                <TableCell
+                  colSpan={4}
+                  className="text-center py-20 text-zinc-500"
+                >
                   No conversations found.
                 </TableCell>
               </TableRow>
             ) : (
-              calls.map((chat) => (
+              calls?.map((chat) => (
                 <TableRow
                   key={chat._id}
                   className="border-zinc-800/50 hover:bg-white/5 transition-colors group cursor-pointer"
@@ -112,7 +119,7 @@ export default function ChatsListPage() {
                           : "bg-zinc-800 text-zinc-400"
                       } border-none px-3 py-1 font-bold text-[10px] rounded-2xl`}
                     >
-                      {chat.status.toUpperCase()}
+                      {/* {chat.status.toUpperCase()} */}
                     </Badge>
                   </TableCell>
                 </TableRow>
