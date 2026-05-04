@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { FileText, ChevronLeft, Phone, Calendar } from "lucide-react";
+import { remoteUrl } from "../page";
 
 // Match the interface from your list page
 interface CallRecord {
@@ -27,7 +28,8 @@ export default function ChatDetailPage() {
       try {
         // Fetching from your NestJS backend
         const response = await fetch(
-          "http://127.0.0.1:3003/calls/tribeca-dental-studio",
+          // "http://127.0.0.1:3003/calls/tribeca-dental-studio",
+          remoteUrl
         );
         const data: CallRecord[] = await response.json();
 
@@ -146,7 +148,7 @@ export default function ChatDetailPage() {
               </h3>
               <audio
                 controls
-                src={`http://127.0.0.1:3003/calls/stream-recording?url=${encodeURIComponent(chat.recordingUrl)}`}
+                src={`https://fusion-ai-bot.onrender.com/calls/stream-recording?url=${encodeURIComponent(chat.recordingUrl)}`}
               />
             </div>
 

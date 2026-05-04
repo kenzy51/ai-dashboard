@@ -20,7 +20,8 @@ interface CallRecord {
   status: string;
   createdAt: string;
 }
-const localUrl = "http://localhost:3003/calls/tribeca-dental-studio";
+export const remoteUrl = "https://fusion-ai-bot.onrender.com/calls/tribeca-dental-studio"
+// const localUrl = "http://localhost:3003/calls/tribeca-dental-studio";
 export default function ChatsListPage() {
   const [calls, setCalls] = useState<CallRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +29,7 @@ export default function ChatsListPage() {
   useEffect(() => {
     const fetchCalls = async () => {
       try {
-        const response = await fetch(localUrl);
+        const response = await fetch(remoteUrl);
         const data = await response.json();
         setCalls(data);
         console.log(calls)
@@ -61,7 +62,7 @@ export default function ChatsListPage() {
                 Patient
               </TableHead>
               <TableHead className="text-zinc-400 font-bold uppercase text-[10px] tracking-widest py-6">
-                Procedure
+                About
               </TableHead>
               <TableHead className="text-zinc-400 font-bold uppercase text-[10px] tracking-widest py-6">
                 AI Summary
