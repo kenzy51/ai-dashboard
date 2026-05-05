@@ -29,11 +29,9 @@ export default function BotConfigPage() {
         if (res.ok) {
           const data = await res.json();
 
-          // Use fallbacks ("") to prevent the inputs from becoming "uncontrolled"
           setKnowledge(data.knowledge || "");
           setGreeting(data.greeting || "");
 
-          // FIX: Convert the Array from the backend back into a Comma-Separated String
           if (Array.isArray(data.keywords)) {
             setKeywords(data.keywords.join(", "));
           } else {

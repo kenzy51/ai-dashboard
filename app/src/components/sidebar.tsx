@@ -13,9 +13,8 @@ import {
 import { usePathname } from "next/navigation";
 
 const menuItems = [
-  { name: "Chats", icon: MessageSquare, href: "/chats" },
-  { name: "Explore", icon: Compass, href: "#" },
   { name: "Dashboard", icon: FileText, href: "/" },
+  { name: "Chats", icon: MessageSquare, href: "/chats" },
   { name: "Bot Config", icon: Cpu, href: "/config" }, 
 ];
 
@@ -36,7 +35,6 @@ export function Sidebar() {
         {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
       </button>
 
-      {/* Logo Area */}
       <div
         className={`px-4 py-2 mb-2 transition-all ${isCollapsed ? "text-center" : ""}`}
       >
@@ -44,17 +42,6 @@ export function Sidebar() {
           {isCollapsed ? "f" : "fusion AI"}
         </h2>
       </div>
-
-      <button
-        className={`flex items-center bg-[#1a1a1a] hover:bg-[#252525] text-zinc-100 rounded-2xl border border-zinc-800/50 transition-all mb-4 ${
-          isCollapsed ? "justify-center p-3" : "px-4 py-3 gap-3 w-full"
-        }`}
-      >
-        <Plus className="h-5 w-5 text-[#d4ff33]" />
-        {!isCollapsed && (
-          <span className="font-medium whitespace-nowrap">New chat</span>
-        )}
-      </button>
 
       <nav className="flex-1 space-y-2">
         {menuItems.map((item) => {
