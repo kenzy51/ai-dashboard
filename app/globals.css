@@ -126,3 +126,13 @@
   --font-sans: 'Geist', sans-serif;
   --font-heading: 'Space Grotesk', sans-serif;
 }
+
+[data-sonner-toast][data-style="success"] {
+  border-color: #d4ff33;
+  background: rgba(212, 255, 51, 0.1);
+}
+
+[data-sonner-toast] [data-title] {
+  font-family: var(--font-geist-sans);
+  font-weight: 700;
+}

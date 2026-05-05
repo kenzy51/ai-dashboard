@@ -10,6 +10,7 @@ import {
   Cpu,
   MessageSquareQuote,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function BotConfigPage() {
   const [knowledge, setKnowledge] = useState("");
@@ -32,6 +33,7 @@ export default function BotConfigPage() {
           setKnowledge(data.knowledge || "");
           setGreeting(data.greeting || "");
 
+          // FIX: Convert the Array from the backend back into a Comma-Separated String
           if (Array.isArray(data.keywords)) {
             setKeywords(data.keywords.join(", "));
           } else {
@@ -50,29 +52,29 @@ export default function BotConfigPage() {
 
   const handleUpdate = async () => {
     setIsSaving(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/leads/update-config`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            knowledge,
-            keywords,
-            greeting, // Sending all three to the new LeadsController endpoint
-          }),
-        },
-      );
+    // Optional: Add a "loading" toast
+    const promise = fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/leads/update-config`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ knowledge, keywords, greeting }),
+      },
+    );
 
-      if (response.ok) {
-        alert("Bot architecture synchronized successfully!");
-      } else {
-        throw new Error("Sync failed");
-      }
+    toast.promise(promise, {
+      loading: "Synchronizing Sarah's brain...",
+      success: () => {
+        return "Bot architecture synchronized successfully!";
+      },
+      error: (err) => `Sync failed: ${err.message}`,
+    });
+
+    try {
+      const response = await promise;
+      if (!response.ok) throw new Error("Sync failed");
     } catch (error: any) {
-      alert("Error updating bot: " + error.message);
+      console.error(error);
     } finally {
       setIsSaving(false);
     }
@@ -98,9 +100,10 @@ export default function BotConfigPage() {
           </p>
         </div>
         <button
+        
           onClick={handleUpdate}
           disabled={isSaving}
-          className="bg-[#d4ff33] text-black px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition-all disabled:opacity-50"
+          className="bg-[#d4ff33] text-black px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition-all disabled:opacity-50 cursor-pointer"
         >
           {isSaving ? (
             <RefreshCw className="animate-spin h-5 w-5" />
@@ -117,7 +120,7 @@ export default function BotConfigPage() {
           <div className="bg-zinc-900/50 border border-white/5 rounded-[32px] p-6 backdrop-blur-md">
             <div className="flex items-center gap-3 mb-4 text-zinc-100">
               <Database className="text-[#d4ff33]" size={20} />
-              <h3 className="font-semibold">Knowledge Base (System Prompt)</h3>
+              <h3 className="font-mono font-bold">KNOWLEDGE BASE (System Prompt)</h3>
             </div>
             <textarea
               className="w-full h-[550px] bg-black/40 border border-zinc-800 rounded-2xl p-4 text-zinc-300 font-mono text-sm focus:outline-none focus:border-[#d4ff33]/50 transition-colors"
@@ -152,7 +155,7 @@ export default function BotConfigPage() {
           <div className="bg-zinc-900/50 border border-white/5 rounded-[32px] p-6 backdrop-blur-md">
             <div className="flex items-center gap-3 mb-4 text-zinc-100">
               <Cpu className="text-[#d4ff33]" size={20} />
-              <h3 className="font-semibold">STT Keywords</h3>
+              <h3 className="font-semibold">Keywords</h3>
             </div>
             <p className="text-xs text-zinc-500 mb-3 italic">
               Comma-separated words to boost recognition.

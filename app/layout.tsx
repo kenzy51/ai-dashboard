@@ -4,6 +4,7 @@ import "./globals.css";
 import { Sidebar } from "@/components/ui/sidebar";
 import { Providers } from "@/components/providers";
 import { getServerSession } from "next-auth";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -51,6 +52,7 @@ export default async function RootLayout({
             </main>
           </div>
         </Providers>
+        <Toaster theme="dark" position="bottom-right" closeButton richColors />
       </body>
     </html>
   );

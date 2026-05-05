@@ -80,7 +80,7 @@ export function Sidebar() {
           }`}
         >
           <div className="w-10 h-10 min-w-[40px] rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-500 flex items-center justify-center text-white font-bold">
-            K
+            TRT
           </div>
           {!isCollapsed && (
             <div className="flex flex-col overflow-hidden flex-1">
