@@ -1,18 +1,63 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useState } from "react";
-import { Save, RefreshCw, Database, Terminal, Shield, Cpu } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Save, RefreshCw, Database, Terminal, Shield, Cpu, MessageSquareQuote } from "lucide-react";
 
 export default function BotConfigPage() {
-  const [knowledge, setKnowledge] = useState(""); // Populate with your TRT_KNOWLEDGE
-  const [keywords, setKeywords] = useState("TRT International, Drayage, Port Newark, RGN");
+  const [knowledge, setKnowledge] = useState("");
+  const [keywords, setKeywords] = useState("");
+  const [greeting, setGreeting] = useState(""); 
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load current config on mount
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/leads/config`); 
+        if (response.ok) {
+          const data = await response.json();
+          setKnowledge(data.knowledge);
+          setKeywords(data.keywords.join(", "));
+          setGreeting(data.greeting);
+        }
+      } catch (err) {
+        console.error("Failed to load bot config:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchConfig();
+  }, []);
 
   const handleUpdate = async () => {
     setIsSaving(true);
-    // Logic to send this to your NestJS backend: 
-    // fetch('/api/bot/config', { method: 'POST', body: JSON.stringify({ knowledge, keywords }) })
-    setTimeout(() => setIsSaving(false), 1500); 
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/leads/update-config`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          knowledge, 
+          keywords, 
+          greeting // Sending all three to the new LeadsController endpoint
+        }),
+      });
+
+      if (response.ok) {
+        alert("Bot architecture synchronized successfully!");
+      } else {
+        throw new Error("Sync failed");
+      }
+    } catch (error:any) {
+      alert("Error updating bot: " + error.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  if (isLoading) return <div className="p-8 text-[#d4ff33] animate-pulse">Loading Sarah&apos;s brain...</div>;
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
@@ -27,7 +72,7 @@ export default function BotConfigPage() {
           disabled={isSaving}
           className="bg-[#d4ff33] text-black px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition-all disabled:opacity-50"
         >
-          {isSaving ? <RefreshCw className="animate-spin h-5 w-5" /> : <Save h-5 w-5 />}
+          {isSaving ? <RefreshCw className="animate-spin h-5 w-5" /> : <Save size={20} />}
           {isSaving ? "Syncing..." : "Apply Changes"}
         </button>
       </div>
@@ -41,8 +86,9 @@ export default function BotConfigPage() {
               <h3 className="font-semibold">Knowledge Base (System Prompt)</h3>
             </div>
             <textarea
-              className="w-full h-[500px] bg-black/40 border border-zinc-800 rounded-2xl p-4 text-zinc-300 font-mono text-sm focus:outline-none focus:border-[#d4ff33]/50 transition-colors"
+              className="w-full h-[550px] bg-black/40 border border-zinc-800 rounded-2xl p-4 text-zinc-300 font-mono text-sm focus:outline-none focus:border-[#d4ff33]/50 transition-colors"
               placeholder="Paste your TRT_KNOWLEDGE here..."
+              spellCheck="false"
               value={knowledge}
               onChange={(e) => setKnowledge(e.target.value)}
             />
@@ -51,13 +97,28 @@ export default function BotConfigPage() {
 
         {/* Sidebar Settings */}
         <div className="space-y-6">
+          {/* Initial Greeting */}
+          <div className="bg-zinc-900/50 border border-white/5 rounded-[32px] p-6 backdrop-blur-md">
+            <div className="flex items-center gap-3 mb-4 text-zinc-100">
+              <MessageSquareQuote className="text-[#d4ff33]" size={20} />
+              <h3 className="font-semibold">Initial Greeting</h3>
+            </div>
+            <p className="text-xs text-zinc-500 mb-3 italic">What Sarah says as soon as someone picks up.</p>
+            <textarea 
+              value={greeting}
+              onChange={(e) => setGreeting(e.target.value)}
+              className="w-full h-24 bg-black/40 border border-zinc-800 rounded-xl p-3 text-zinc-300 text-sm focus:outline-none focus:border-[#d4ff33]/50"
+              placeholder="Hello, this is Sarah..."
+            />
+          </div>
+
           {/* Deepgram Keywords */}
           <div className="bg-zinc-900/50 border border-white/5 rounded-[32px] p-6 backdrop-blur-md">
             <div className="flex items-center gap-3 mb-4 text-zinc-100">
               <Cpu className="text-[#d4ff33]" size={20} />
               <h3 className="font-semibold">STT Keywords</h3>
             </div>
-            <p className="text-xs text-zinc-500 mb-3 italic">Comma-separated words to boost Deepgram recognition.</p>
+            <p className="text-xs text-zinc-500 mb-3 italic">Comma-separated words to boost recognition.</p>
             <input 
               type="text"
               value={keywords}
@@ -83,8 +144,8 @@ export default function BotConfigPage() {
             <div className="flex gap-3">
               <Shield size={18} className="text-[#d4ff33] shrink-0" />
               <p className="text-[11px] text-zinc-400">
-                Changes made here update the <strong>VoiceService</strong> config in real-time. 
-                Ensure all mandatory variables like <strong>973-344-7100</strong> are present.
+                Syncing triggers an instant update to <strong>Sarah&apos;s</strong> logic. 
+                Ensure phone numbers and ports are accurate.
               </p>
             </div>
           </div>

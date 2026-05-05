@@ -13,7 +13,7 @@ import {
 import { usePathname } from "next/navigation";
 
 const menuItems = [
-  { name: "Chats", icon: MessageSquare, href: "/chats", badge: 2 },
+  { name: "Chats", icon: MessageSquare, href: "/chats" },
   { name: "Explore", icon: Compass, href: "#" },
   { name: "Dashboard", icon: FileText, href: "/" },
   { name: "Bot Config", icon: Cpu, href: "/config" }, 
@@ -81,14 +81,6 @@ export function Sidebar() {
                 )}
               </div>
 
-              {!isCollapsed && item.badge && (
-                <span className="bg-[#252525] text-zinc-400 text-[10px] px-2 py-0.5 rounded-full border border-zinc-800">
-                  {item.badge}
-                </span>
-              )}
-              {isCollapsed && item.badge && (
-                <div className="absolute top-2 right-2 w-2 h-2 bg-[#d4ff33] rounded-full shadow-[0_0_8px_#d4ff33]" />
-              )}
             </Link>
           );
         })}
