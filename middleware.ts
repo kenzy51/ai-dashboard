@@ -1,6 +1,5 @@
 import { withAuth } from "next-auth/middleware";
 
-// Explicitly export the function as default
 export default withAuth({
   pages: {
     signIn: "/login",
@@ -8,10 +7,6 @@ export default withAuth({
 });
 
 export const config = { 
-  matcher: [
-    "/chats/:path*", 
-    "/dashboard/:path*", 
-    "/config/:path*",
-    "/" 
-  ] 
+  // Protects everything except login, api, and static assets
+  matcher: ["/((?!login|api|_next/static|_next/image|favicon.ico).*)"],
 };

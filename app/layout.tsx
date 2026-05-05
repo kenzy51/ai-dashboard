@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "./src/components/sidebar";
-import { Providers } from "./src/components/providers"; // Ensure you created this wrapper
+import { Sidebar } from "@/components/ui/sidebar";
+import { Providers } from "@/components/providers";
 import { getServerSession } from "next-auth";
 
 const geistSans = Geist({
@@ -22,29 +22,32 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  // Check if the user is logged in
+}) {
   const session = await getServerSession();
 
   return (
-    <html lang="en" className="dark"> 
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}>
+    <html lang="en" className="dark">
+      <body className="antialiased bg-black text-white font-sans">
         <Providers>
-          <div className="flex min-h-screen"> 
+          <div className="flex min-h-screen">
+            {/* Show Sidebar if session exists */}
             {session && <Sidebar />}
-            
+
             <main className="flex-1 h-screen overflow-y-auto">
-              {session && (
-                <div className="max-w-6xl mx-auto p-8 pb-0 uppercase tracking-wider text-[10px] font-bold text-zinc-500">
-                  Overview / 2026 Marketing
+              {session ? (
+                // Wrapper for authenticated content
+                <div className="w-full h-full flex flex-col">
+                  <div className="max-w-6xl mx-auto w-full p-8 pb-0 uppercase tracking-wider text-[10px] font-bold text-zinc-500">
+                    Overview / 2026 Marketing
+                  </div>
+                  {children}
                 </div>
+              ) : (
+                // Wrapper for Login Page
+                <div className="w-full h-full">{children}</div>
               )}
-              
-              <div className={session ? "" : "flex items-center justify-center min-h-screen"}>
-                {children}
-              </div>
             </main>
           </div>
         </Providers>

@@ -1,14 +1,14 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { signOut } from "next-auth/react"; 
 import {
-  Plus,
   MessageSquare,
-  Compass,
   FileText,
   ChevronLeft,
   ChevronRight,
-  Cpu
+  Cpu,
+  LogOut 
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -30,7 +30,7 @@ export function Sidebar() {
     >
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-12 bg-[#d4ff33] text-black rounded-full p-1 shadow-lg hover:scale-110 transition-transform"
+        className="absolute -right-3 top-12 bg-[#d4ff33] text-black rounded-full p-1 shadow-lg hover:scale-110 transition-transform z-50"
       >
         {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
       </button>
@@ -67,16 +67,15 @@ export function Sidebar() {
                   <span className="text-[15px] font-medium">{item.name}</span>
                 )}
               </div>
-
             </Link>
           );
         })}
       </nav>
 
-      {/* User Profile */}
-      <div className="mt-auto pt-4 border-t border-zinc-800/50">
+      {/* User Profile & Logout */}
+      <div className="mt-auto pt-4 border-t border-zinc-800/50 space-y-2">
         <div
-          className={`flex items-center gap-3 rounded-2xl transition-colors cursor-pointer hover:bg-[#1a1a1a] ${
+          className={`flex items-center gap-3 rounded-2xl transition-colors ${
             isCollapsed ? "justify-center py-2" : "px-3 py-2"
           }`}
         >
@@ -84,14 +83,27 @@ export function Sidebar() {
             K
           </div>
           {!isCollapsed && (
-            <div className="flex flex-col overflow-hidden">
+            <div className="flex flex-col overflow-hidden flex-1">
               <span className="text-sm font-semibold text-zinc-100 truncate">
-                TRT{" "}
+                TRT Admin
               </span>
-              <span className="text-xs text-zinc-500 italic">Admin</span>
+              <span className="text-xs text-zinc-500 italic">Connected</span>
             </div>
           )}
         </div>
+
+        {/* 3. Logout Button */}
+        <button
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className={`flex items-center gap-4 w-full rounded-2xl py-3 px-4 text-zinc-500 hover:text-red-400 hover:bg-red-500/5 transition-all group ${
+            isCollapsed ? "justify-center" : ""
+          }`}
+        >
+          <LogOut className="h-5 w-5 min-w-[20px] group-hover:scale-110 transition-transform" />
+          {!isCollapsed && (
+            <span className="text-[14px] font-semibold">Log out</span>
+          )}
+        </button>
       </div>
     </div>
   );

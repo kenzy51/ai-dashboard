@@ -28,7 +28,7 @@ export default function LoginPage() {
           className="w-full bg-black/50 border border-white/10 p-4 rounded-2xl text-white focus:outline-none focus:ring-1 focus:ring-[#d4ff33]"
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button className="w-full h-14" type="submit">Unlock Dashboard</Button>
+        <Button className="w-full h-14" type="submit">Log In</Button>
       </form>
     </div>
   );
