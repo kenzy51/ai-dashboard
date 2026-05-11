@@ -9,11 +9,13 @@ import {
   Shield,
   Cpu,
   MessageSquareQuote,
+  BrainCircuit,
 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function BotConfigPage() {
   const [knowledge, setKnowledge] = useState("");
+  const [prompt, setPrompt] = useState(""); 
   const [keywords, setKeywords] = useState("");
   const [greeting, setGreeting] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -23,17 +25,12 @@ export default function BotConfigPage() {
     const loadBotConfig = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/leads/config`,
-        );
-
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/leads/config`);
         if (res.ok) {
           const data = await res.json();
-
           setKnowledge(data.knowledge || "");
+          setPrompt(data.prompt || ""); 
           setGreeting(data.greeting || "");
-
-          // FIX: Convert the Array from the backend back into a Comma-Separated String
           if (Array.isArray(data.keywords)) {
             setKeywords(data.keywords.join(", "));
           } else {
@@ -41,32 +38,25 @@ export default function BotConfigPage() {
           }
         }
       } catch (err) {
-        console.error("Failed to sync with Sarah's brain:", err);
+        console.error("Failed to sync:", err);
       } finally {
         setIsLoading(false);
       }
     };
-
     loadBotConfig();
   }, []);
 
   const handleUpdate = async () => {
     setIsSaving(true);
-    // Optional: Add a "loading" toast
-    const promise = fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/leads/update-config`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ knowledge, keywords, greeting }),
-      },
-    );
+    const promise = fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/leads/update-config`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ knowledge, prompt, keywords, greeting }),
+    });
 
     toast.promise(promise, {
       loading: "Synchronizing Sarah's brain...",
-      success: () => {
-        return "Bot architecture synchronized successfully!";
-      },
+      success: "Bot architecture synchronized!",
       error: (err) => `Sync failed: ${err.message}`,
     });
 
@@ -80,115 +70,93 @@ export default function BotConfigPage() {
     }
   };
 
-  if (isLoading)
-    return (
-      <div className="p-8 text-[#d4ff33] animate-pulse">
-        Loading Sarah&apos;s brain...
-      </div>
-    );
+  if (isLoading) return <div className="p-8 text-[#d4ff33] animate-pulse font-mono uppercase">Initializing Architecture...</div>;
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="p-8 max-w-[auto]  space-y-8 animate-in fade-in duration-500">
       {/* Header */}
-      <div className="flex justify-between items-end">
+      <div className="flex justify-between items-center border-b border-white/5 pb-8">
         <div>
-          <h1 className="text-4xl font-bold text-zinc-100 tracking-tighter">
-            Bot Architecture
-          </h1>
-          <p className="text-zinc-500 mt-2 text-lg">
-            Update Sarah&apos;s intelligence and STT keywords.
-          </p>
+          <h1 className="text-5xl font-bold text-zinc-100 tracking-tighter">Sarah Config</h1>
+          <p className="text-zinc-500 mt-2 text-lg font-medium italic">Adjust the neural layers and behavioral constraints.</p>
         </div>
         <button
-        
           onClick={handleUpdate}
           disabled={isSaving}
-          className="bg-[#d4ff33] text-black px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:scale-105 transition-all disabled:opacity-50 cursor-pointer"
+          className="bg-[#d4ff33] text-black px-8 py-4 rounded-2xl font-bold flex items-center gap-3 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(212,255,51,0.2)]"
         >
-          {isSaving ? (
-            <RefreshCw className="animate-spin h-5 w-5" />
-          ) : (
-            <Save size={20} />
-          )}
-          {isSaving ? "Syncing..." : "Apply Changes"}
+          {isSaving ? <RefreshCw className="animate-spin h-5 w-5" /> : <Save size={22} />}
+          {isSaving ? "Syncing..." : "Sync Brain"}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Knowledge Base Editor */}
-        <div className="lg:col-span-2 space-y-4">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+        {/* Behavioral Layer (Prompt) */}
+        <div className="xl:col-span-4 space-y-4">
+          <div className="bg-zinc-900/50 border border-white/5 rounded-[32px] p-6 backdrop-blur-md">
+            <div className="flex items-center gap-3 mb-4 text-zinc-100">
+              <BrainCircuit className="text-[#d4ff33]" size={20} />
+              <h3 className="font-mono font-bold uppercase tracking-tight">System Prompt</h3>
+            </div>
+            <textarea
+              className="w-full h-[600px] bg-black/40 border border-zinc-800 rounded-2xl p-4 text-zinc-300 font-mono text-xs leading-relaxed focus:outline-none focus:border-[#d4ff33]/50"
+              placeholder="Persona instructions..."
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="xl:col-span-5 space-y-4">
           <div className="bg-zinc-900/50 border border-white/5 rounded-[32px] p-6 backdrop-blur-md">
             <div className="flex items-center gap-3 mb-4 text-zinc-100">
               <Database className="text-[#d4ff33]" size={20} />
-              <h3 className="font-mono font-bold">KNOWLEDGE BASE (System Prompt)</h3>
+              <h3 className="font-mono font-bold uppercase tracking-tight">Knowledge Base</h3>
             </div>
             <textarea
-              className="w-full h-[550px] bg-black/40 border border-zinc-800 rounded-2xl p-4 text-zinc-300 font-mono text-sm focus:outline-none focus:border-[#d4ff33]/50 transition-colors"
-              placeholder="Paste your TRT_KNOWLEDGE here..."
-              spellCheck="false"
+              className="w-full h-[600px] bg-black/40 border border-zinc-800 rounded-2xl p-4 text-zinc-300 font-mono text-xs leading-relaxed focus:outline-none focus:border-[#d4ff33]/50"
+              placeholder="Factual logistics data..."
               value={knowledge}
               onChange={(e) => setKnowledge(e.target.value)}
             />
           </div>
         </div>
 
-        {/* Sidebar Settings */}
-        <div className="space-y-6">
-          {/* Initial Greeting */}
-          <div className="bg-zinc-900/50 border border-white/5 rounded-[32px] p-6 backdrop-blur-md">
+        {/* Configuration Layer (Sidebar) */}
+        <div className="xl:col-span-3 space-y-6">
+          <div className="bg-zinc-900/50 border border-white/5 rounded-[32px] p-6">
             <div className="flex items-center gap-3 mb-4 text-zinc-100">
               <MessageSquareQuote className="text-[#d4ff33]" size={20} />
-              <h3 className="font-semibold">Initial Greeting</h3>
+              <h3 className="font-semibold">Greeting</h3>
             </div>
-            <p className="text-xs text-zinc-500 mb-3 italic">
-              What Sarah says as soon as someone picks up.
-            </p>
             <textarea
               value={greeting}
               onChange={(e) => setGreeting(e.target.value)}
-              className="w-full h-24 bg-black/40 border border-zinc-800 rounded-xl p-3 text-zinc-300 text-sm focus:outline-none focus:border-[#d4ff33]/50"
-              placeholder="Hello, this is Sarah..."
+              className="w-full h-24 bg-black/40 border border-zinc-800 rounded-xl p-3 text-zinc-300 text-sm focus:border-[#d4ff33]/50 outline-none"
             />
           </div>
 
-          {/* Deepgram Keywords */}
-          <div className="bg-zinc-900/50 border border-white/5 rounded-[32px] p-6 backdrop-blur-md">
+          <div className="bg-zinc-900/50 border border-white/5 rounded-[32px] p-6">
             <div className="flex items-center gap-3 mb-4 text-zinc-100">
               <Cpu className="text-[#d4ff33]" size={20} />
-              <h3 className="font-semibold">Keywords</h3>
+              <h3 className="font-semibold">STT Keywords</h3>
             </div>
-            <p className="text-xs text-zinc-500 mb-3 italic">
-              Comma-separated words to boost recognition.
-            </p>
-            <input
-              type="text"
+            <textarea
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
-              className="w-full bg-black/40 border border-zinc-800 rounded-xl p-3 text-zinc-300 text-sm focus:outline-none focus:border-[#d4ff33]/50"
+              className="w-full bg-black/40 border border-zinc-800 rounded-xl p-3 text-zinc-300 text-sm focus:border-[#d4ff33]/50 outline-none"
             />
           </div>
 
-          {/* Model Status */}
-          <div className="bg-zinc-900/50 border border-white/5 rounded-[32px] p-6 backdrop-blur-md">
+          <div className="bg-zinc-900/50 border border-white/5 rounded-[32px] p-6">
             <div className="flex items-center gap-3 mb-4 text-zinc-100">
               <Terminal className="text-[#d4ff33]" size={20} />
-              <h3 className="font-semibold">Model Status</h3>
+              <h3 className="font-semibold">System</h3>
             </div>
-            <div className="space-y-3">
-              <StatusItem label="LLM" value="Llama-3.1-8b" />
-              <StatusItem label="STT" value="Deepgram Nova-2" />
-              <StatusItem label="TTS" value="ElevenLabs Flash" />
-            </div>
-          </div>
-
-          <div className="p-4 bg-[#d4ff33]/5 border border-[#d4ff33]/20 rounded-2xl">
-            <div className="flex gap-3">
-              <Shield size={18} className="text-[#d4ff33] shrink-0" />
-              <p className="text-[11px] text-zinc-400">
-                Syncing triggers an instant update to{" "}
-                <strong>Sarah&apos;s</strong> logic. Ensure phone numbers and
-                ports are accurate.
-              </p>
+            <div className="space-y-2">
+              <StatusItem label="LLM" value="Llama-3.1" />
+              <StatusItem label="STT" value="Nova-2" />
+              <StatusItem label="TTS" value="11Labs" />
             </div>
           </div>
         </div>
@@ -199,11 +167,9 @@ export default function BotConfigPage() {
 
 function StatusItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-center bg-black/20 p-3 rounded-xl border border-zinc-800/50">
-      <span className="text-xs text-zinc-500 uppercase font-bold tracking-widest">
-        {label}
-      </span>
-      <span className="text-sm text-zinc-200">{value}</span>
+    <div className="flex justify-between items-center bg-black/20 p-2 px-3 rounded-xl border border-zinc-800/50">
+      <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">{label}</span>
+      <span className="text-xs text-zinc-200 font-mono">{value}</span>
     </div>
   );
 }
