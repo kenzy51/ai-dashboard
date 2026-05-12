@@ -13,7 +13,7 @@ export default function FusionChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hello! I'm Sarah. How can I help you with your freight today?" }
+    { role: "assistant", content: "Hello! I'm Sarah from TRT International. How can I help you with your freight today?" }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   
