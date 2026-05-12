@@ -17,7 +17,7 @@ import { toast } from "sonner";
 export default function BotConfigPage() {
   const [knowledge, setKnowledge] = useState("");
   const [chatPrompt, setChatPrompt] = useState(""); 
-  const [voicePrompt, setVoicePrompt] = useState(""); 
+  const [prompt, setPrompt] = useState(""); 
   const [keywords, setKeywords] = useState("");
   const [greeting, setGreeting] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -30,7 +30,7 @@ export default function BotConfigPage() {
           const data = await res.json();
           setKnowledge(data.knowledge || "");
           setChatPrompt(data.chatPrompt || ""); 
-          setVoicePrompt(data.prompt || "");
+          setPrompt(data.prompt || "");
           setGreeting(data.greeting || "");
           setKeywords(Array.isArray(data.keywords) ? data.keywords.join(", ") : data.keywords || "");
         }
@@ -44,7 +44,7 @@ export default function BotConfigPage() {
     const promise = fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/leads/update-config`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ knowledge, chatPrompt, voicePrompt, keywords, greeting }),
+      body: JSON.stringify({ knowledge, chatPrompt,prompt , keywords, greeting }),
     });
 
     toast.promise(promise, {
@@ -102,8 +102,8 @@ export default function BotConfigPage() {
           <ConfigCard icon={<Mic size={16}/>} title="Voice Intelligence (Acoustic Persona)">
             <textarea
               className="config-textarea h-[400px]"
-              value={voicePrompt}
-              onChange={(e) => setVoicePrompt(e.target.value)}
+              value={}
+              onChange={(e) => setPrompt(e.target.value)}
               placeholder="Speech patterns and brevity..."
             />
           </ConfigCard>
