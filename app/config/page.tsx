@@ -70,7 +70,7 @@ export default function BotConfigPage() {
     }
   };
 
-  if (isLoading) return <div className="p-8 text-[#d4ff33] animate-pulse font-mono uppercase">Initializing Architecture...</div>;
+  // if (isLoading) return <div className="p-8 text-[#d4ff33] animate-pulse font-mono uppercase">Initializing Architecture...</div>;
 
   return (
     <div className="p-8 max-w-[auto]  space-y-8 animate-in fade-in duration-500">
