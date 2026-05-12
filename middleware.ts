@@ -7,8 +7,8 @@ export default withAuth({
 });
 
 export const config = { 
-  // We explicitly exclude the login page and all internal Next.js/API calls
+  // 💡 Add "dist" to the exclusion list below
   matcher: [
-    "/((?!api|login|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api|login|dist|_next/static|_next/image|favicon.ico).*)",
   ] 
 };
