@@ -102,7 +102,7 @@ export default function BotConfigPage() {
           <ConfigCard icon={<Mic size={16}/>} title="Voice Intelligence (Acoustic Persona)">
             <textarea
               className="config-textarea h-[400px]"
-              value={}
+              value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Speech patterns and brevity..."
             />
