@@ -82,7 +82,7 @@ export default function FusionChatWidget() {
 
   return (
     /* 💡 all-initial prevents WordPress from leaking global styles like 'line-height' or 'color' */
-    <div className="relative text-left leading-normal antialiased">
+    <div className="fusion-ai-app-container relative text-left leading-normal antialiased">
       {" "}
       <div
         className={`fixed z-[9999] flex flex-col box-border transition-all duration-300
@@ -176,8 +176,9 @@ export default function FusionChatWidget() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                  placeholder="Type your message..."
-                  className="w-full bg-black border border-zinc-800 rounded-2xl pl-5 pr-14 py-4 text-white text-[16px] focus:outline-none focus:border-[#d4ff33]/50 appearance-none !m-0 box-border !shadow-none"
+                  placeholder="Ask Sarah about freight..."
+                  /* 💡 bg-zinc-900 is that nice dark grey */
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl pl-5 pr-14 py-4 text-white text-[16px] outline-none focus:border-[#d4ff33]/50 transition-all !m-0"
                 />
                 <button
                   onClick={sendMessage}
@@ -203,6 +204,26 @@ export default function FusionChatWidget() {
           </button>
         )}
       </div>
+      <style>{`
+  .fusion-ai-app-container * {
+    box-sizing: border-box !important;
+  }
+  .fusion-ai-app-container input {
+    all: revert !important;
+    box-sizing: border-box !important;
+    background-color: #18181b !important; 
+    color: #ffffff !important;
+    border: 1px solid #27272a !important;
+    padding: 1rem 3.5rem 1rem 1.25rem !important; /* matches your pl-5 pr-14 py-4 */
+    border-radius: 1rem !important; /* matches rounded-2xl */
+    font-size: 16px !important;
+    width: 100% !important;
+  }
+  .fusion-ai-app-container input::placeholder {
+    color: #71717a !important;
+    opacity: 1 !important;
+  }
+`}</style>
     </div>
   );
 }
