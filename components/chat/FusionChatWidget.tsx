@@ -15,8 +15,7 @@ export default function FusionChatWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content:
-        "Hello! I'm Sarah from TRT International. How can I help you with your freight today?",
+      content: "Hello! I'm Sarah from TRT International. How can I help you today?",
     },
   ]);
   const [isTyping, setIsTyping] = useState(false);
@@ -30,217 +29,130 @@ export default function FusionChatWidget() {
     }
   }, [messages, isTyping]);
 
- useEffect(() => {
-  // 💡 Hardcode the production URL here for the widget build 
-  // to ensure it works regardless of environment variables.
-  const baseUrl = "https://fusion-ai-bot.onrender.com";
-  
-  // 💡 FORCE 'wss://' instead of relying on replace(/^http/, "ws")
-  const socketUrl = "wss://fusion-ai-bot.onrender.com/chat-stream";
+  useEffect(() => {
+    const socketUrl = "wss://fusion-ai-bot.onrender.com/chat-stream";
+    const socket = new WebSocket(socketUrl);
 
-  console.log("Sarah is connecting to:", socketUrl);
+    socket.onmessage = (event) => {
+      try {
+        const response = JSON.parse(event.data);
+        if (response.event === "ai_response") {
+          setMessages((prev) => [...prev, { role: "assistant", content: response.data }]);
+          setIsTyping(false);
+        }
+      } catch (err) { console.error("WS Error:", err); }
+    };
 
-  const socket = new WebSocket(socketUrl);
+    socketRef.current = socket;
+    return () => socket.close();
+  }, []);
 
-  socket.onopen = () => {
-    console.log("✅ Sarah is online and connected to the brain.");
-  };
-
-  socket.onerror = (error) => {
-    console.error("❌ WebSocket Error:", error);
-  };
-
-  socket.onmessage = (event) => {
-    try {
-      const response = JSON.parse(event.data);
-      if (response.event === "ai_response") {
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: response.data },
-        ]);
-        setIsTyping(false);
-      }
-    } catch (err) {
-      console.error("WS Message Error:", err);
-    }
-  };
-
-  socketRef.current = socket;
-  
-  return () => {
-    if (socket.readyState === WebSocket.OPEN) {
-      socket.close();
-    }
-  };
-}, []);
   const sendMessage = () => {
-    if (
-      !input.trim() ||
-      !socketRef.current ||
-      socketRef.current.readyState !== WebSocket.OPEN
-    )
-      return;
+    if (!input.trim() || !socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
     const userMsg: Message = { role: "user", content: input };
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
-
-    socketRef.current.send(
-      JSON.stringify({
-        event: "message",
-        data: { text: input, history: messages.slice(-5) },
-      }),
-    );
+    socketRef.current.send(JSON.stringify({
+      event: "message",
+      data: { text: input, history: messages.slice(-5) },
+    }));
     setInput("");
   };
 
-  const handleCallEscalation = () => {
-    window.location.href = "tel:+19297022797";
-  };
+  const handleCall = () => { window.location.href = "tel:+19297022797"; };
 
   return (
-    /* 💡 all-initial prevents WordPress from leaking global styles like 'line-height' or 'color' */
-    <div className="fusion-ai-app-container relative text-left leading-normal antialiased">
-      {" "}
-      <div
-        className={`fixed z-[9999] flex flex-col box-border transition-all duration-300
-        ${isOpen ? "inset-0 md:inset-auto md:bottom-6 md:right-6" : "bottom-6 right-6"}`}
-      >
+    <div className="fusion-ai-app-container relative text-left antialiased">
+      <div className={`fixed z-[9999] transition-all duration-300 ease-in-out flex flex-col
+        ${isOpen 
+          ? "inset-0 bg-zinc-950 md:inset-auto md:bottom-6 md:right-6 md:w-[420px] md:h-[700px] md:rounded-[32px] md:border md:border-white/10 shadow-2xl" 
+          : "bottom-6 right-6"}`}>
+        
         {isOpen ? (
-          <div className="flex flex-col w-full h-full md:w-[420px] md:h-[650px] bg-zinc-950 md:border md:border-white/10 md:rounded-[32px] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-6">
-            {/* Header - Fixed Height for consistency */}
-            <div className="pt-12 pb-6 px-6 md:pt-6 bg-zinc-900/80 backdrop-blur-md border-b border-white/5 flex justify-between items-center box-border !m-0">
+          <>
+            {/* Header: Adjusted for Mobile Notches */}
+            <div className="pt-[env(safe-area-inset-top,12px)] md:pt-6 pb-4 px-6 bg-zinc-900/90 backdrop-blur-md border-b border-white/5 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-[#d4ff33] rounded-full shadow-[0_0_10px_#d4ff33]" />
+                <div className="w-2.5 h-2.5 bg-[#d4ff33] rounded-full shadow-[0_0_10px_#d4ff33]" />
                 <div>
-                  <h3 className="text-white font-bold text-lg leading-none !m-0">
-                    Sarah AI
-                  </h3>
-                  <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mt-1 !m-0">
-                    Logistics Expert
-                  </p>
+                  <h3 className="text-white font-bold text-base leading-none">Sarah AI</h3>
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">TRT Expert</p>
                 </div>
               </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleCallEscalation}
-                  className="p-2 hover:bg-[#d4ff33]/10 rounded-full text-[#d4ff33] transition-colors group !border-none !bg-transparent"
-                >
-                  <PhoneCall size={20} className="group-hover:scale-110" />
-                </button>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-white/5 rounded-full text-zinc-500 !border-none !bg-transparent"
-                >
-                  <X size={24} />
-                </button>
-              </div>
+              <button onClick={() => setIsOpen(false)} className="p-2 -mr-2 text-zinc-400 hover:text-white">
+                <X size={24} />
+              </button>
             </div>
 
-            {/* Chat Area - Flex Grow */}
-            <div
-              ref={scrollRef}
-              className="flex-1 overflow-y-auto p-5 space-y-4 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-zinc-900/20 via-transparent to-transparent box-border"
-            >
+            {/* Chat Area: flex-1 allows it to shrink when keyboard opens */}
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-4 bg-black overscroll-contain">
               {messages.map((m, i) => (
-                <div
-                  key={i}
-                  className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in`}
-                >
-                  <div
-                    className={`max-w-[85%] p-4 rounded-2xl text-[15px] md:text-sm leading-relaxed box-border ${
-                      m.role === "user"
-                        ? "bg-[#d4ff33] text-black font-medium rounded-tr-none shadow-lg shadow-[#d4ff33]/10"
-                        : "bg-zinc-800/80 text-zinc-200 rounded-tl-none border border-white/5"
-                    }`}
-                  >
+                <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div className={`max-w-[85%] p-4 rounded-2xl text-[16px] leading-relaxed shadow-sm ${
+                      m.role === "user" ? "bg-[#d4ff33] text-black font-semibold rounded-tr-none" : "bg-zinc-800/80 text-zinc-100 rounded-tl-none border border-white/5"
+                    }`}>
                     {m.content}
                   </div>
                 </div>
               ))}
-
-              {/* Call Trigger UI */}
+              
+              {/* Conditional Call Button */}
               {messages.length > 2 && !isTyping && (
-                <div className="flex flex-col items-center gap-3 py-4 animate-in zoom-in box-border">
-                  <button
-                    onClick={handleCallEscalation}
-                    className="group flex items-center gap-3 bg-[#d4ff33] text-black px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-tight hover:scale-105 active:scale-95 transition-all shadow-xl !border-none"
-                  >
-                    <PhoneCall size={16} fill="black" />
-                    Call Sarah Now
+                <div className="flex justify-center py-2">
+                  <button onClick={handleCall} className="flex items-center gap-2 bg-[#d4ff33] text-black px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-tight">
+                    <PhoneCall size={14} /> Call Team Now
                   </button>
                 </div>
               )}
 
               {isTyping && (
-                <div className="flex justify-start">
-                  <div className="bg-zinc-800/80 p-4 rounded-2xl rounded-tl-none border border-white/5">
-                    <div className="flex gap-1 animate-pulse">
-                      <div className="w-1.5 h-1.5 bg-[#d4ff33] rounded-full" />
-                      <div className="w-1.5 h-1.5 bg-[#d4ff33] rounded-full" />
-                      <div className="w-1.5 h-1.5 bg-[#d4ff33] rounded-full" />
-                    </div>
-                  </div>
+                <div className="flex justify-start animate-pulse text-[#d4ff33] text-[10px] font-bold uppercase tracking-widest pl-2">
+                  Sarah is thinking...
                 </div>
               )}
             </div>
 
-            {/* Input Footer - Fully Isolated */}
-            <div className="p-4 pb-8 md:p-6 bg-zinc-900/80 border-t border-white/5 backdrop-blur-md box-border">
-              <div className="relative flex items-center w-full !max-w-full box-border !m-0">
+            {/* Footer: Locked to Bottom above home bar */}
+            <div className="p-4 pb-[max(env(safe-area-inset-bottom,16px),16px)] md:p-6 bg-zinc-900 border-t border-white/5 shrink-0">
+              <div className="relative flex items-center w-full">
                 <input
                   autoFocus
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                  placeholder="Ask Sarah about freight..."
-                  /* 💡 bg-zinc-900 is that nice dark grey */
+                  placeholder="Message Sarah..."
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl pl-5 pr-14 py-4 text-white text-[16px] outline-none focus:border-[#d4ff33]/50 transition-all !m-0"
                 />
-                <button
-                  onClick={sendMessage}
-                  disabled={!input.trim()}
-                  className="absolute right-2 bg-[#d4ff33] p-3 rounded-xl text-black hover:scale-105 active:scale-95 transition-all disabled:opacity-30 !m-0 flex items-center justify-center !border-none"
-                >
+                <button onClick={sendMessage} className="absolute right-2 bg-[#d4ff33] p-3 rounded-xl text-black">
                   <Send size={20} strokeWidth={2.5} />
                 </button>
               </div>
             </div>
-          </div>
+          </>
         ) : (
-          /* Floating Trigger Button */
-          <button
-            onClick={() => setIsOpen(true)}
-            className="group relative bg-[#d4ff33] w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-[28px] flex items-center justify-center shadow-2xl hover:scale-110 transition-all !border-none !p-0"
-          >
-            <div className="absolute inset-0 rounded-[28px] bg-[#d4ff33] animate-ping opacity-20" />
-            <MessageCircle
-              size={32}
-              className="text-black group-hover:rotate-12 transition-transform"
-            />
+          <button onClick={() => setIsOpen(true)} className="group relative bg-[#d4ff33] w-16 h-16 md:w-20 md:h-20 rounded-[24px] md:rounded-[32px] flex items-center justify-center shadow-2xl hover:scale-110 transition-all">
+            <div className="absolute inset-0 rounded-[24px] md:rounded-[32px] bg-[#d4ff33] animate-ping opacity-20" />
+            <MessageCircle size={32} className="text-black" />
           </button>
         )}
       </div>
+
       <style>{`
-  .fusion-ai-app-container * {
-    box-sizing: border-box !important;
-  }
-  .fusion-ai-app-container input {
-    all: revert !important;
-    box-sizing: border-box !important;
-    background-color: #18181b !important; 
-    color: #ffffff !important;
-    border: 1px solid #27272a !important;
-    padding: 1rem 3.5rem 1rem 1.25rem !important; /* matches your pl-5 pr-14 py-4 */
-    border-radius: 1rem !important; /* matches rounded-2xl */
-    font-size: 16px !important;
-    width: 100% !important;
-  }
-  .fusion-ai-app-container input::placeholder {
-    color: #71717a !important;
-    opacity: 1 !important;
-  }
-`}</style>
+        .fusion-ai-app-container * { box-sizing: border-box !important; }
+        .fusion-ai-app-container input {
+          all: revert !important;
+          box-sizing: border-box !important;
+          background-color: #18181b !important;
+          color: #ffffff !important;
+          border: 1px solid #27272a !important;
+          padding: 1rem 3.5rem 1rem 1.25rem !important;
+          border-radius: 1rem !important;
+          font-size: 16px !important;
+          width: 100% !important;
+        }
+        .fusion-ai-app-container input::placeholder { color: #71717a !important; opacity: 1 !important; }
+        .fusion-ai-app-container button { all: revert !important; cursor: pointer !important; }
+      `}</style>
     </div>
   );
 }
