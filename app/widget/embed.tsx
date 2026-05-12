@@ -10,21 +10,28 @@ const initFusionChat = () => {
     document.body.appendChild(host);
   }
 
-  // 💡 Check if we already initialized to prevent double-rendering
   if (host.shadowRoot) return;
 
   const shadow = host.attachShadow({ mode: 'open' });
   const container = document.createElement('div');
   container.id = 'fusion-widget-mount';
+  // 💡 Ensure the container itself has a height/width context
+  container.style.display = 'block'; 
   shadow.appendChild(container);
 
-  // 🚀 THE FIX: Find the Tailwind styles and move them into the Shadow Root
-  // Vite-plugin-css-injected-by-js puts styles in a <style> tag in the <head>
-  const tailwindStyles = document.querySelectorAll('style');
-  tailwindStyles.forEach((style) => {
-    // We look for the tag that contains Tailwind or Vite injected markers
-    if (style.textContent?.includes('tailwindcss') || style.hasAttribute('data-vite-plugin-css-injected-by-js')) {
-      shadow.appendChild(style.cloneNode(true));
+  // 🚀 THE ULTIMATE STYLE INJECTION
+  // We grab all styles and check for Tailwind markers
+  const allStyles = Array.from(document.querySelectorAll('style'));
+  allStyles.forEach((style) => {
+    // Vite-plugin-css-injected-by-js and Tailwind usually leave these clues
+    const isTailwind = style.textContent?.includes('tailwindcss') || 
+                      style.textContent?.includes('--tw-') ||
+                      style.hasAttribute('data-vite-plugin-css-injected-by-js');
+    
+    if (isTailwind) {
+      const newStyle = document.createElement('style');
+      newStyle.textContent = style.textContent;
+      shadow.appendChild(newStyle);
     }
   });
 
