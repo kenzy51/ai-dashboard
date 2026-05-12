@@ -30,32 +30,49 @@ export default function FusionChatWidget() {
     }
   }, [messages, isTyping]);
 
-  useEffect(() => {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_SERVER_URL ||
-      "https://fusion-ai-bot.onrender.com";
-    const socketUrl = `${baseUrl.replace(/^http/, "ws")}/chat-stream`;
-    const socket = new WebSocket(socketUrl);
+ useEffect(() => {
+  // 💡 Hardcode the production URL here for the widget build 
+  // to ensure it works regardless of environment variables.
+  const baseUrl = "https://fusion-ai-bot.onrender.com";
+  
+  // 💡 FORCE 'wss://' instead of relying on replace(/^http/, "ws")
+  const socketUrl = "wss://fusion-ai-bot.onrender.com/chat-stream";
 
-    socket.onmessage = (event) => {
-      try {
-        const response = JSON.parse(event.data);
-        if (response.event === "ai_response") {
-          setMessages((prev) => [
-            ...prev,
-            { role: "assistant", content: response.data },
-          ]);
-          setIsTyping(false);
-        }
-      } catch (err) {
-        console.error("WS Message Error:", err);
+  console.log("Sarah is connecting to:", socketUrl);
+
+  const socket = new WebSocket(socketUrl);
+
+  socket.onopen = () => {
+    console.log("✅ Sarah is online and connected to the brain.");
+  };
+
+  socket.onerror = (error) => {
+    console.error("❌ WebSocket Error:", error);
+  };
+
+  socket.onmessage = (event) => {
+    try {
+      const response = JSON.parse(event.data);
+      if (response.event === "ai_response") {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: response.data },
+        ]);
+        setIsTyping(false);
       }
-    };
+    } catch (err) {
+      console.error("WS Message Error:", err);
+    }
+  };
 
-    socketRef.current = socket;
-    return () => socket.close();
-  }, []);
-
+  socketRef.current = socket;
+  
+  return () => {
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.close();
+    }
+  };
+}, []);
   const sendMessage = () => {
     if (
       !input.trim() ||
