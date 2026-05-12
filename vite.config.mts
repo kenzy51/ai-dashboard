@@ -16,8 +16,8 @@ export default defineConfig({
       '@': path.resolve(__dirname, './'),
     },
   },
-  build: {
-    cssCodeSplit:false,
+ build: {
+    cssCodeSplit: false, // 💡 Keep this false
     lib: {
       entry: path.resolve(__dirname, 'app/widget/embed.tsx'),
       name: 'FusionChat',
