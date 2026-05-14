@@ -98,7 +98,7 @@ export default function FusionChatWidget() {
 
             {/* --- FOOTER / INPUT AREA (Fix applied to clickability) --- */}
             <div className="p-8 bg-gradient-to-t from-zinc-950 to-transparent shrink-0 relative z-[999999]">
-              <div className="relative flex items-center group pointer-events-auto">
+              <div className="relative flex items-center group pointer-events-none">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-[#d4ff33] to-transparent rounded-[26px] blur opacity-0 group-focus-within:opacity-20 transition duration-700" />
                 <input
                   autoFocus
