@@ -102,13 +102,13 @@ export default function FusionChatWidget() {
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="close-btn w-10 h-10 flex items-center justify-center bg-white/5 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-all"
+                className="close-btn w-10 h-10 flex items-center justify-center bg-white/5 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
               >
                 <X size={20} />
               </button>
             </div>
 
-            {/* --- CHAT ENGINE (Layered Depth) --- */}
+            {/* --- CHAT ENGINE --- */}
             <div
               ref={scrollRef}
               className="flex-1 overflow-y-auto px-8 py-6 space-y-8 scrollbar-hide overscroll-contain"
@@ -133,22 +133,6 @@ export default function FusionChatWidget() {
                 </div>
               ))}
 
-              {messages.length > 2 && !isTyping && (
-                <div className="pt-6 flex justify-center animate-in zoom-in duration-700">
-                  <button
-                    onClick={() => (window.location.href = "tel:+19297022797")}
-                    className="call-btn group relative flex items-center gap-4 bg-white text-black px-10 py-5 rounded-full font-black text-xs uppercase tracking-[0.2em] hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)] transition-all"
-                  >
-                    <PhoneCall
-                      size={16}
-                      fill="black"
-                      className="group-hover:rotate-12 transition-transform"
-                    />
-                    Secure Line
-                  </button>
-                </div>
-              )}
-
               {isTyping && (
                 <div className="flex items-center gap-3 pl-2 opacity-50">
                   <div className="flex gap-1">
@@ -156,15 +140,13 @@ export default function FusionChatWidget() {
                     <div className="w-1.5 h-1.5 bg-[#d4ff33] rounded-full animate-bounce [animation-delay:-0.15s]" />
                     <div className="w-1.5 h-1.5 bg-[#d4ff33] rounded-full animate-bounce" />
                   </div>
-                  <span className="text-[10px] text-[#d4ff33] font-black tracking-widest uppercase">
-                    Analyzing...
-                  </span>
                 </div>
               )}
             </div>
 
-            <div className="p-8 bg-gradient-to-t from-zinc-950 to-transparent shrink-0">
-              <div className="relative flex items-center group">
+            {/* --- FOOTER / INPUT AREA --- */}
+            <div className="p-8 bg-gradient-to-t from-zinc-950 to-transparent shrink-0 relative z-[10001]">
+              <div className="relative flex items-center group pointer-events-auto">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-[#d4ff33] to-transparent rounded-[26px] blur opacity-0 group-focus-within:opacity-20 transition duration-700" />
                 <input
                   autoFocus
@@ -172,41 +154,31 @@ export default function FusionChatWidget() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                   placeholder="Initiate Command..."
-                  className="widget-input relative w-full bg-[#09090b] border border-white/10 rounded-[24px] pl-7 pr-20 py-6 text-white text-[16px] outline-none focus:border-[#d4ff33]/40 transition-all m-0 shadow-inner"
+                  className="widget-input relative w-full bg-[#09090b] border border-white/10 rounded-[24px] pl-7 pr-20 py-6 text-white text-[16px] outline-none focus:border-[#d4ff33]/40 transition-all m-0 shadow-inner z-[10002]"
                 />
+                {/* 💡 INCREASED BUTTON SIZE (w-16 h-16) AND ICON SIZE (size={28}) */}
                 <button
-                  onClick={sendMessage}
-                  className="send-btn absolute right-3 w-14 h-14 bg-[#d4ff33] rounded-2xl text-black flex items-center justify-center hover:shadow-[0_0_25px_rgba(212,255,51,0.6)] group-active:scale-90 transition-all"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    sendMessage();
+                  }}
+                  className="send-btn absolute right-2 w-16 h-16 bg-[#d4ff33] rounded-2xl text-black flex items-center justify-center hover:shadow-[0_0_25px_rgba(212,255,51,0.6)] group-active:scale-90 transition-all z-[10003] cursor-pointer"
                 >
-                  <Send size={24} strokeWidth={3} />
+                  <Send size={28} strokeWidth={3} />
                 </button>
-              </div>
-              <div className="flex justify-between items-center mt-6 px-2">
-                <p className="text-[8px] text-zinc-700 font-black tracking-[0.5em] uppercase">
-                  Fusion AI v3.0
-                </p>
-                <div className="flex gap-1">
-                  <div className="w-1 h-1 bg-zinc-800 rounded-full" />
-                  <div className="w-1 h-1 bg-zinc-800 rounded-full" />
-                  <div className="w-1 h-1 bg-[#d4ff33] rounded-full" />
-                </div>
               </div>
             </div>
           </>
         ) : (
-          /* PRESTIGE TRIGGER */
           <button
             onClick={() => setIsOpen(true)}
-            className="launcher-btn group relative bg-[#d4ff33] w-20 h-20 rounded-[32px] flex items-center justify-center shadow-[0_25px_50px_-12px_rgba(212,255,51,0.4)] hover:scale-110 active:scale-90 transition-all duration-500"
+            className="launcher-btn group relative bg-[#d4ff33] w-20 h-20 rounded-[32px] flex items-center justify-center shadow-[0_25px_50px_-12px_rgba(212,255,51,0.4)] hover:scale-110 active:scale-90 transition-all duration-500 cursor-pointer"
           >
             <div className="absolute inset-0 rounded-[32px] bg-[#d4ff33] animate-ping opacity-10" />
             <MessageCircle
               size={36}
               className="text-black group-hover:scale-110 transition-transform"
             />
-            <div className="absolute -top-1 -right-1 w-6 h-6 bg-zinc-950 rounded-full border-4 border-black flex items-center justify-center">
-              <div className="w-2 h-2 bg-[#d4ff33] rounded-full" />
-            </div>
           </button>
         )}
       </div>
@@ -219,14 +191,24 @@ export default function FusionChatWidget() {
           color: white !important;
           border: 1px solid rgba(255,255,255,0.08) !important;
           border-radius: 24px !important;
-          padding: 1.5rem 5rem 1.5rem 1.75rem !important;
+          padding: 1.5rem 5.5rem 1.5rem 1.75rem !important; /* Adjusted right padding for bigger button */
           font-size: 16px !important;
           width: 100% !important;
-          box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05) !important;
+          pointer-events: auto !important;
         }
-        .fusion-ai-app-container button { all: unset !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; }
-        .fusion-ai-app-container .send-btn, .fusion-ai-app-container .launcher-btn { background: #d4ff33 !important; color: black !important; border-radius: 18px !important; }
-        .fusion-ai-app-container .call-btn { background: white !important; color: black !important; border-radius: 100px !important; }
+        .fusion-ai-app-container button { 
+            all: unset !important; 
+            cursor: pointer !important; 
+            display: flex !important; 
+            align-items: center !important; 
+            justify-content: center !important; 
+            pointer-events: auto !important;
+        }
+        .fusion-ai-app-container .send-btn, .fusion-ai-app-container .launcher-btn { 
+            background: #d4ff33 !important; 
+            color: black !important; 
+            border-radius: 18px !important; 
+        }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
       `}</style>
     </div>
