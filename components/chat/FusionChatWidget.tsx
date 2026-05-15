@@ -114,7 +114,7 @@ export default function FusionChatWidget() {
             style={{ backgroundColor: '#6B8E6B' }} // Matches the sage/green in your screenshot exactly
           >
             <div className="absolute inset-0 rounded-full bg-[#6B8E6B] animate-ping opacity-20" />
-            <MessageCircleMore size={38} className="text-white fill-white" />
+            <MessageCircleMore size={38} className="text-white fill-[#d4ff33]" />
           </button>
         )}
       </div>
