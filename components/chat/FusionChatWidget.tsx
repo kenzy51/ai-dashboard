@@ -2,7 +2,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, Send, PhoneCall, Zap, ShieldCheck } from "lucide-react";
+// 💡 Added MessageCircleMore for that specific "chat bubble" look
+import { MessageCircleMore, X, Send, Zap, ShieldCheck } from "lucide-react";
 
 export default function FusionChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,8 +41,6 @@ export default function FusionChatWidget() {
   };
 
   return (
-    // 💡 FIX: The outermost container is now an invisible 'ghost' layer over the whole screen
-    // It has the highest possible Z-index to beat any WordPress theme.
     <div className="fusion-ai-app-container fixed inset-0 z-[999999999] pointer-events-none antialiased" style={{ isolation: 'isolate' }}>
       
       <div className={`fixed transition-all duration-500 cubic-bezier(0.16, 1, 0.3, 1) flex flex-col pointer-events-auto
@@ -51,7 +50,7 @@ export default function FusionChatWidget() {
         
         {isOpen ? (
           <>
-            {/* --- CINEMATIC HEADER (Styles Preserved) --- */}
+            {/* --- HEADER --- */}
             <div className="pt-[env(safe-area-inset-top,24px)] md:pt-10 pb-6 px-8 flex justify-between items-center shrink-0 border-b border-white/5 bg-gradient-to-b from-zinc-900/40 to-transparent">
               <div className="flex items-center gap-4">
                 <div className="relative group">
@@ -72,7 +71,7 @@ export default function FusionChatWidget() {
               </button>
             </div>
 
-            {/* --- CHAT ENGINE --- */}
+            {/* --- MESSAGES --- */}
             <div ref={scrollRef} className="flex-1 overflow-y-auto px-8 py-6 space-y-8 scrollbar-hide overscroll-contain">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
@@ -80,23 +79,12 @@ export default function FusionChatWidget() {
                       m.role === "user" ? "bg-[#d4ff33] text-black font-black rounded-tr-none" : "bg-zinc-900/60 text-zinc-100 rounded-tl-none border border-white/10 backdrop-blur-xl"
                     }`}>
                     {m.content}
-                    {m.role === "assistant" && <div className="absolute top-0 left-[-4px] w-1 h-8 bg-[#d4ff33] rounded-full opacity-40 blur-[2px]" />}
                   </div>
                 </div>
               ))}
-
-              {isTyping && (
-                <div className="flex items-center gap-3 pl-2 opacity-50">
-                  <div className="flex gap-1">
-                    <div className="w-1.5 h-1.5 bg-[#d4ff33] rounded-full animate-bounce [animation-delay:-0.3s]" />
-                    <div className="w-1.5 h-1.5 bg-[#d4ff33] rounded-full animate-bounce [animation-delay:-0.15s]" />
-                    <div className="w-1.5 h-1.5 bg-[#d4ff33] rounded-full animate-bounce" />
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* --- FOOTER / INPUT AREA (Fix applied to clickability) --- */}
+            {/* --- INPUT --- */}
             <div className="p-8 bg-gradient-to-t from-zinc-950 to-transparent shrink-0 relative z-[999999]">
               <div className="relative flex items-center group pointer-events-none">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-[#d4ff33] to-transparent rounded-[26px] blur opacity-0 group-focus-within:opacity-20 transition duration-700" />
@@ -109,7 +97,6 @@ export default function FusionChatWidget() {
                   className="widget-input relative w-full bg-[#09090b] border border-white/10 rounded-[24px] pl-7 pr-24 py-6 text-white text-[16px] outline-none focus:border-[#d4ff33]/40 m-0 shadow-inner z-[10]"
                   style={{ pointerEvents: 'auto' }}
                 />
-                {/* 💡 ENLARGED BUTTON AS REQUESTED */}
                 <button
                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); sendMessage(); }}
                   className="send-btn absolute right-2 w-16 h-16 bg-[#d4ff33] rounded-2xl text-black flex items-center justify-center hover:shadow-[0_0_25px_rgba(212,255,51,0.6)] group-active:scale-90 transition-all z-[20] cursor-pointer"
@@ -120,25 +107,26 @@ export default function FusionChatWidget() {
             </div>
           </>
         ) : (
+          /* 💡 UPDATED LAUNCHER: Circular background with filled chat icon to match reference */
           <button
             onClick={() => setIsOpen(true)}
-            className="launcher-btn group relative bg-[#d4ff33] w-20 h-20 rounded-[32px] flex items-center justify-center shadow-2xl hover:scale-110 transition-all pointer-events-auto cursor-pointer"
+            className="launcher-btn group relative bg-[#6B8E6B] w-20 h-20 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all pointer-events-auto cursor-pointer"
+            style={{ backgroundColor: '#6B8E6B' }} // Matches the sage/green in your screenshot exactly
           >
-            <div className="absolute inset-0 rounded-[32px] bg-[#d4ff33] animate-ping opacity-10" />
-            <MessageCircle size={36} className="text-black" />
+            <div className="absolute inset-0 rounded-full bg-[#6B8E6B] animate-ping opacity-20" />
+            <MessageCircleMore size={38} className="text-white fill-white" />
           </button>
         )}
       </div>
 
       <style>{`
-        .fusion-ai-app-container * { box-sizing: border-box !important; -webkit-tap-highlight-color: transparent; }
         .fusion-ai-app-container .widget-input {
           all: revert !important;
           background: #09090b !important;
           color: white !important;
           border: 1px solid rgba(255,255,255,0.08) !important;
           border-radius: 24px !important;
-          padding: 1.5rem 6rem 1.5rem 1.75rem !important;
+          padding: 1.5rem 6.5rem 1.5rem 1.75rem !important;
           font-size: 16px !important;
           width: 100% !important;
           pointer-events: auto !important;
@@ -150,13 +138,6 @@ export default function FusionChatWidget() {
           align-items: center !important; 
           justify-content: center !important; 
           pointer-events: auto !important;
-        }
-        .fusion-ai-app-container .send-btn { 
-          background: #d4ff33 !important; 
-          color: black !important; 
-          border-radius: 18px !important; 
-          min-width: 64px !important;
-          min-height: 64px !important;
         }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
       `}</style>
